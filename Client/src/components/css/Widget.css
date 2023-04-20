@@ -16,7 +16,8 @@
 }
 
 .widget__header>h5 {
-    padding: 10px;
+    padding:5px 10px;
+    padding-bottom: 0px;
     color: rgb(80, 80, 80);
     letter-spacing: 1.1px;
 }
@@ -45,11 +46,11 @@
 
 .widget__contentTitle>h5 {
     color: rgb(70, 68, 68);
-    font-size:1.2rem;
+    font-size:0.8rem;
     font-weight: bold;
 }
 
 .widget__contentTitle>p {
     color: gray;
-    font-size:1rem;
+    font-size:0.7rem;
 }
