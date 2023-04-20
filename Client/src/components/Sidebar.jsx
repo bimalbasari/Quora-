@@ -92,9 +92,9 @@ function SidebarOption() {
         />
         <p>Education</p>
       </div>
-      <div className="sidebarOption">
-        <HiPlus/>
-        <p className="text">Discover Spaces</p>
+      <div className="sidebarAddOption">
+      <p> <HiPlus/></p>
+        <p className="text"> Discover <br/>Spaces</p>
       </div>
     </div>
   )

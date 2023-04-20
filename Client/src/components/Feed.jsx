@@ -4,7 +4,7 @@ import { Avatar } from './QuoraHeader';
 import { RxThickArrowDown, RxThickArrowUp } from "react-icons/rx";
 import { TbMessageCircle2 } from "react-icons/tb";
 import { TiArrowSync } from "react-icons/ti";
-import { HiOutlineShare, HiDotsHorizontal } from "react-icons/hi"
+import { HiOutlineShare, HiDotsHorizontal } from "react-icons/hi";
 import { Modal } from "react-responsive-modal";
 import 'react-responsive-modal/styles.css';
 import ReactQuill from 'react-quill';
