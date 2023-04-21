@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import "./css/Feed.css";
 import { Avatar } from './QuoraHeader';
 import { RxThickArrowDown, RxThickArrowUp } from "react-icons/rx";
@@ -9,19 +9,45 @@ import { Modal } from "react-responsive-modal";
 import 'react-responsive-modal/styles.css';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import axios from 'axios';
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
+import ReactHtmlParser from "html-react-parser";
+
+const TimeStamp = (date) => {
+  let dt = new Date(date);
+  console.log(dt)
+  TimeAgo.addDefaultLocale(en)
+  // Create formatter (English).
+  const timeAgo = new TimeAgo('en-US')
+  // "1 minute ago"
+  let time = timeAgo.format(dt - 60 * 1000, 'mini')
+
+  return (<>{time}</>)
+}
 
 
 const Feed = () => {
+  const [posts, setPosts] = useState([]);
+  useEffect(() => {
+    axios
+      .get("/api/questions")
+      .then((res) => {
+        console.log(res.data.reverse());
+        setPosts(res.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }, []);
   return (
     <div className='feed'>
       <QuoraBox />
-      <Post />
-      <Post />
-      <Post />
-      <Post />
-      <Post />
-      <Post />
-      <Post />
+
+      {posts.map((post, index) => (
+        <Post key={index} post={post} />
+      ))}
+
     </div>
   )
 }
@@ -43,20 +69,49 @@ function QuoraBox() {
 
 
 
-function Post() {
+
+function Post({ post }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [answer, setAnswer] = useState("");
+
+  const handelQuill = (value) => {
+    setAnswer(value);
+  }
+  const handelSubmit = async () => {
+
+    if (post?._id && answer !== "") {
+      const body = {
+        answer: answer,
+        questionId: post._id,
+      }
+
+      const config = {
+        headers: {
+          "Contenct-Type": "aplication/json"
+        }
+      }
+
+      await axios.post("/api/answers", body, config)
+        .then(() => {
+          alert("Answer aded sucessfully");
+          setIsModalOpen(false);
+          window.location.href = "/"
+        }).catch((e) => console.log(e));
+
+    }
+  }
   return (
     <div className='post'>
 
       <div className='post__info'>
         <Avatar />
         <h4>User Name</h4>
-        <small>Time Stamp</small>
+        <small>{TimeStamp(post?.createdAt)}</small>
       </div>
 
       <div className='post__body'>
         <div className='post__question'>
-          <p>This is test Question ?</p>
+          <p>{post?.questionName}</p>
           <button className='post__btnAnswer' onClick={() => setIsModalOpen(true)}>Answer</button>
           <Modal
             open={isModalOpen}
@@ -71,22 +126,29 @@ function Post() {
             }}
           >
             <div className='modal__question'>
-              <h1>This is the test question</h1>
-              <p>asked by {" "} <span className='name'>userName</span> on <span className='name'>timestamp</span> </p>
+              <h1>{post?.questionName}</h1>
+              <p>
+                asked by {" "} <span className='name'>userName</span> on
+
+                <span className='name'> {new Date(post?.createdAt).toLocaleString()}</span>
+
+              </p>
+
             </div>
             <div className='modal__answer' style={{ marginBottom: "10px", }}>
-              <ReactQuill placeholder='Enter your answer' />
+              <ReactQuill value={answer} placeholder='Enter your answer' onChange={handelQuill} />
             </div>
             <div className="modal__button">
               <button className="cancle" onClick={() => setIsModalOpen(false)}>
                 Cancel
               </button>
-              <button type="submit" className="add">
-                Add Question
+              <button type="submit" className="add" onClick={handelSubmit}>
+                Add Answer
               </button>
             </div>
           </Modal>
         </div>
+        {post.questionUrl !== "" && <img src={post.questionUrl} alt="url" />}
       </div>
 
       <div className='post__footer'>
@@ -107,50 +169,56 @@ function Post() {
       </div>
 
       <p style={{
-        color: "rgba(0,0,0,0.5)",
+        color: "rgb(0,0,0)",
         fontSize: "12px",
         fontWeight: "bold",
         margin: "1rem 0rem"
 
       }}
-      >1 Answer</p>
+      >{post?.allAnswers.length} Answer(s)</p>
 
-
-      <div style={{
-        margin: "5px 0px 0px 0px",
-        padding: "5px 0px 0px 20px",
-        borderTop: "1px solid lightgray"
-      }} className='post__answer'>
-
-        <div style={{
-          display: "flex",
-          flexDirection: "column",
-          width: "100%",
-          padding: "0.7rem  0.5rem",
-          borderTop: "1px solid lightgray",
-        }} className='post-answer-container'>
-
+      {post?.allAnswers?.map((_a) => (
+        <>
           <div style={{
-            display: "flex",
-            flexDirection: "column",
-            marginBottom: "10px",
+            margin: "5px 0px 0px 0px",
+            padding: "5px 0px 0px 20px",
+            borderTop: "1px solid lightgray"
+          }} className='post__answer'>
 
-          }} className='post__answered'>
-
-            <div className='post__info'>
-              <Avatar />
-              <h4>User Name</h4>
-              <small>Time Stamp</small>
-            </div>
             <div style={{
-              fontWeight: 600,
-              color: "#888",
-            }} className='post-answer'>
-              <h4>This is test answer this is test answer .</h4>
+              display: "flex",
+              flexDirection: "column",
+              width: "100%",
+              padding: "0.7rem  0.5rem",
+              borderTop: "1px solid lightgray",
+            }} className='post-answer-container'>
+
+              <div style={{
+                display: "flex",
+                flexDirection: "column",
+                marginBottom: "10px",
+
+              }} className='post__answered'>
+
+                <div className='post__info'>
+                  <Avatar />
+                  <h4>User Name</h4>
+                  <small>{TimeStamp(_a.createdAt)}</small>
+                </div>
+                <div style={{
+                  fontWeight: 600,
+                  color: "#888",
+                }} className='post-answer'>
+                  {ReactHtmlParser(_a?.answer)}
+                </div>
+
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </>
+
+      ))}
+
     </div>
   )
 
