@@ -6,7 +6,7 @@ const bodyParser = require("body-parser");
 const PORT = process.env.PORT || 3000;
 const db = require("./db");
 const router = require("./routes")
-require('dotenv').config()
+require('dotenv').config();
 
 // Mongodb Connection
 
@@ -20,27 +20,24 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
 
 // cors 
 app.use((req, res, next) => {
-    req.headers("Acces-control-Allow-Origin", "*")
-    req.headers("Acces-control-Allow-Headers", "*")
+    req.header("Acces-control-Allow-Origin", "*")
+    req.header("Acces-control-Allow-Headers", "*")
     next()
 });
-
+app.use(cors());
 
 // Static
 app.use("/uploads", express.static(path.join(__dirname, "/../uploads")));
-app.use("/uploads", express.static(path.join(__dirname, "/../fronted/build")));
-app.use(cors());
+app.use(express.static(path.join(__dirname, "/../Client/dist")));
+
 
 // routes
 
-app.use("/api",router)
-
-
-
+app.use("/api", router)
 
 app.get("*", (req, res) => {
     try {
-        res.sendFile(path.join(`${__dirname}/../fronted/build`));
+        res.sendFile(path.join(`${__dirname}/../Client/dist/index.html`));
     } catch (e) {
         res.send("Oops! unexpected eroor")
     }
