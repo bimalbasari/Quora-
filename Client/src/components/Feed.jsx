@@ -13,6 +13,8 @@ import axios from 'axios';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import ReactHtmlParser from "html-react-parser";
+import { useSelector } from 'react-redux';
+import { selectUser } from '../feature/userSlice';
 
 const TimeStamp = (date) => {
   let dt = new Date(date);
@@ -73,6 +75,7 @@ function QuoraBox() {
 function Post({ post }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [answer, setAnswer] = useState("");
+  const user = useSelector(selectUser);
 
   const handelQuill = (value) => {
     setAnswer(value);
@@ -83,6 +86,7 @@ function Post({ post }) {
       const body = {
         answer: answer,
         questionId: post._id,
+        user: user,
       }
 
       const config = {
@@ -105,7 +109,7 @@ function Post({ post }) {
 
       <div className='post__info'>
         <Avatar />
-        <h4>User Name</h4>
+        <h4>{user?.userName}</h4>
         <small>{TimeStamp(post?.createdAt)}</small>
       </div>
 
@@ -128,7 +132,7 @@ function Post({ post }) {
             <div className='modal__question'>
               <h1>{post?.questionName}</h1>
               <p>
-                asked by {" "} <span className='name'>userName</span> on
+                asked by {" "} <span className='name'>{user?.userName}</span> on
 
                 <span className='name'> {new Date(post?.createdAt).toLocaleString()}</span>
 
@@ -148,7 +152,7 @@ function Post({ post }) {
             </div>
           </Modal>
         </div>
-        {post.questionUrl !== "" && <img src={post.questionUrl} alt="url" />}
+        {post.questionUrl !== "" && <img src={post.questionUrl} />}
       </div>
 
       <div className='post__footer'>
@@ -202,7 +206,7 @@ function Post({ post }) {
 
                 <div className='post__info'>
                   <Avatar />
-                  <h4>User Name</h4>
+                  <h4>{_a.user?.userName}</h4>
                   <small>{TimeStamp(_a.createdAt)}</small>
                 </div>
                 <div style={{

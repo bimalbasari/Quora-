@@ -9,6 +9,7 @@ router.post("/", async (req, res) => {
         await questionDB.create({
             questionName: req.body.questionName,
             questionUrl: req.body.questionUrl,
+            user: req.body.user
 
         }).then(() => {
             res.status(201).send({
@@ -35,27 +36,27 @@ router.get("/", async (req, res) => {
         await questionDB.aggregate(
             [
                 {
-            $lookup: {
-                from: "answers", //Collection to join
-                localField: "_id", //field from input document
-                foreignField: "questionId", 
-                as: "allAnswers" //output array fild
-            }
-        }
-    ]
-    ).exec().then((doc)=>{
+                    $lookup: {
+                        from: "answers", //Collection to join
+                        localField: "_id", //field from input document
+                        foreignField: "questionId",
+                        as: "allAnswers" //output array fild
+                    }
+                }
+            ]
+        ).exec().then((doc) => {
             res.status(200).send(doc);
-        }).catch((err)=>{
+        }).catch((err) => {
             res.status(500).send({
-                status:false,
-                message:"Unable to get the question details"
+                status: false,
+                message: "Unable to get the question details"
 
             })
         })
-    } catch(e){
+    } catch (e) {
         res.status(500).send({
-            status:false,
-            message:"Unexpact eror"
+            status: false,
+            message: "Unexpact eror"
 
         })
     }

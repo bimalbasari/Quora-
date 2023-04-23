@@ -87,11 +87,17 @@
 .qHeader__avatar {
     cursor: pointer;
     margin-left: 1rem !important;
-    height: 1 rem;
-    width: 1 rem;
+    height: 1rem;
+    width: 1rem;
 }
+.avatar__img{
+    cursor: pointer;
+    height: 35px;
+    width: 35px;
+    overflow: hidden;
+    border-radius: 50%;
 
-
+}
 
 .qHeader__Rem {
     font-size: xx-large;
